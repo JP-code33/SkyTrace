@@ -14,7 +14,14 @@
       <button onclick="changeSkyTraceMapLayer('dark')">Dark</button>
       <button onclick="changeSkyTraceMapLayer('satellite')">Satellite</button>
       <button onclick="changeSkyTraceMapLayer('terrain')">Terrain</button>
+
+      <div class="skyTraceWeatherToggle">
+        <label><input type="checkbox" id="skyTraceWeatherCheckbox" onchange="toggleSkyTraceRadar()">Weather Radar</label>
+      </div>
     </div>
+
+    </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

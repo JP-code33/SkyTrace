@@ -2,6 +2,7 @@ import "leaflet/dist/leaflet.css"
 import "./style.css"
 import L from "leaflet"
 
+
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
 
 const skyTraceStandardMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -33,3 +34,50 @@ function changeSkyTraceMapLayer(skyTraceLayerName) {
   skyTraceMapLayers[skyTraceLayerName].addTo(skyTraceMap)
 }
 window.changeSkyTraceMapLayer = changeSkyTraceMapLayer
+
+let skyTraceRadarLayer = null
+
+async function loadSkyTraceRadar() {
+  try {
+    const skyTraceRadarResponse = await fetch("https://api.rainviewer.com/public/weather-maps.json")
+    
+    if(!skyTraceRadarResponse.ok) {
+      throw new Error(`Radar API error: ${skyTraceRadarResponse.status}`)
+    }
+
+    const skyTraceRadarData = await skyTraceRadarResponse.json()
+    const skyTraceRadarFrames = skyTraceRadarData.radar?.past || []
+
+    if(skyTraceRadarFrames.length === 0) {
+      console.log("No SkyTrace radar frames available")
+      return
+    }
+
+    const skyTraceLatestRadar = skyTraceRadarFrames[skyTraceRadarFrames.length -1]
+    const skyTraceRadarTileUrl = `${skyTraceRadarData.host}${skyTraceLatestRadar.path}/256/{z}/{x}/{y}/2/1_1.png`
+
+    skyTraceRadarLayer = L.tileLayer(skyTraceRadarTileUrl, {
+      opacity: 0.6, attribution: "Weather data by RainViewer"
+    })
+  } catch(skyTraceRadarError) {
+    console.error("failed to load SkyTrace weather:", skyTraceRadarError)
+  }
+}
+
+async function toggleSkyTraceRadar() {
+  if(!skyTraceRadarLayer) {
+    await loadSkyTraceRadar()
+  }
+
+  if(!skyTraceRadarLayer) {
+    return
+  }
+
+  if(skyTraceMap.hasLayer(skyTraceRadarLayer)) {
+    skyTraceMap.removeLayer(skyTraceRadarLayer)
+  } else {
+    skyTraceRadarLayer.addTo(skyTraceMap)
+  }
+}
+
+window.toggleSkyTraceRadar = toggleSkyTraceRadar
