@@ -1,6 +1,7 @@
 import "leaflet/dist/leaflet.css"
 import "./style.css"
 import L from "leaflet"
+//import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
 
 
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
@@ -81,3 +82,38 @@ async function toggleSkyTraceRadar() {
 }
 
 window.toggleSkyTraceRadar = toggleSkyTraceRadar
+
+function showSkyTraceAircraftPanel(aircraft) {
+  document.getElementById("skyTraceAircraftCallsign").textContent = aircraft.callsign || "Unknown"
+  document.getElementById("skyTraceAircraftAltitude").textContent = aircraft.altitude != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
+  document.getElementById("skyTraceAircraftSpeed").textContent = aircraft.speed != null ? `${Math.round(aircraft.speed)}kt` : "N/A"
+  document.getElementById("skyTraceAircraftHeading").textContent = aircraft.heading !=null ? `${Math.round(aircraft.heading)}°` : "N/A"
+  document.getElementById("skyTraceAircraftRegistration").textContent = aircraft.registration || "N/A"
+  document.getElementById("skyTraceAircraftType").textContent = aircraft.aircraftType || "N/A"
+  document.getElementById("skyTraceAircraftICAO").textContent = aircraft.id || "N/A"
+  document.getElementById("skyTraceAircraftPanel").classList.add("open")
+}
+
+function closeSkyTraceAircraftPanel() {
+  document.getElementById("skyTraceAircraftPanel").classList.remove("open")
+}
+
+window.showSkyTraceAircraftPanel = showSkyTraceAircraftPanel
+window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
+
+const skyTraceTestAircraft = {
+  id: "HELLO123",
+  callsign: "SKY345",
+  latitude: 39.8,
+  longitude: -98.5,
+  altitude: 35000,
+  speed: 567, 
+  heading: 275,
+  registration: "N123",
+  aircraftType: "B738"
+}
+
+const skyTraceAircraftMarker = L.marker([skyTraceTestAircraft.latitude, skyTraceTestAircraft.longitude]).addTo(skyTraceMap)
+skyTraceAircraftMarker.on("click", () => {
+  showSkyTraceAircraftPanel(skyTraceTestAircraft)
+})
