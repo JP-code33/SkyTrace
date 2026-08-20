@@ -102,7 +102,51 @@ function closeSkyTraceAircraftPanel() {
 window.showSkyTraceAircraftPanel = showSkyTraceAircraftPanel
 window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
 
-const skyTraceTestAircraft = {
+const aircraftMarkers = new Map()
+function createAircraftIcon(heading) {
+  return L.divIcon({
+    className: "skyTraceAircraftIcon",
+    html: `<img src="${planeIcon}" alt="Aircraft" style="transform: rotate(${heading || 0}deg)">`,
+    iconSize: [60, 60],
+    iconAnchor: [30, 30]
+  })
+}
+
+function updateAircraftMarkers(aircraftList) {
+  const currentAircraftIds = new Set()
+  aircraftList.forEach((aircraft) => {
+    if(aircraft.latitude == null || aircraft.longitude == null || aircraft.id == null) {
+      return
+    }
+
+    currentAircraftIds.add(aircraft.id)
+    let marker = aircraftMarkers.get(aircraft.id)
+    if(!marker) {
+      marker = L.marker([aircraft.latitude, aircraft.longitude], 
+        {
+          icon: createAircraftIcon(aircraft.heading)}).addTo(skyTraceMap)
+      
+          marker.on("click", () => {
+        showSkyTraceAircraftPanel(aircraft)
+      })
+      
+      aircraftMarkers.set(aircraft.id, marker)
+    } else {
+      marker.setLatLng([aircraft.latitude, aircraft.longtitude])
+      marker.setIcon(createAircraftIcon(aircraft.heading))
+    }
+  })
+
+  aircraftMarkers.forEach((marker, aircraftId) => {
+    if(!currentAircraftIds.has(aircraftId)) {
+      skyTraceMap.removeLayer(marker)
+      aircraftMarkers.delete(aircraftId)
+    }
+  })
+}
+
+const testAircraft = [
+  {
   id: "HELLO123",
   callsign: "SKY345",
   latitude: 39.8,
@@ -112,14 +156,29 @@ const skyTraceTestAircraft = {
   heading: 275,
   registration: "N123",
   aircraftType: "B738"
+}, 
+{
+  id: "HELLO456",
+  callsign: "SKY123",
+  latitude: 41.2,
+  longitude: -96.2,
+  altitude: 28000,
+  speed: 430,
+  heading: 90,
+  registration: "N456",
+  aircraftType: "A380"
+},
+{
+  id: "HELLO789",
+  callsign: "SKY789",
+  latitude: 37.5,
+  longitude: -101.4,
+  altitude: 32000,
+  speed: 510,
+  heading: 180,
+  registration: "N789",
+  aircraftType: "A350"
 }
+]
 
-const aircraftIcon = L.divIcon({
-  className: "skyTraceAircraftIcon",
-  html: `<img src="${planeIcon}" alt="Aircraft" style="transform: rotate(${skyTraceTestAircraft.heading}deg)">`,
-  iconSize: [40, 40],
-  iconAnchor: [20, 20]
-})
-const aircraftMarker = L.marker([skyTraceTestAircraft.latitude, skyTraceTestAircraft.longitude], {icon: aircraftIcon}).addTo(skyTraceMap)
-aircraftMarker.on("click", () => {
-  showSkyTraceAircraftPanel(skyTraceTestAircraft)})
+updateAircraftMarkers(testAircraft)
