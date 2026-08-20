@@ -2,6 +2,7 @@ import "leaflet/dist/leaflet.css"
 import "./style.css"
 import L from "leaflet"
 //import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
+import planeIcon from "./assets/planeIcon.png"
 
 
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
@@ -113,7 +114,12 @@ const skyTraceTestAircraft = {
   aircraftType: "B738"
 }
 
-const skyTraceAircraftMarker = L.marker([skyTraceTestAircraft.latitude, skyTraceTestAircraft.longitude]).addTo(skyTraceMap)
-skyTraceAircraftMarker.on("click", () => {
-  showSkyTraceAircraftPanel(skyTraceTestAircraft)
+const aircraftIcon = L.divIcon({
+  className: "skyTraceAircraftIcon",
+  html: `<img src="${planeIcon}" alt="Aircraft" style="transform: rotate(${skyTraceTestAircraft.heading}deg)">`,
+  iconSize: [40, 40],
+  iconAnchor: [20, 20]
 })
+const aircraftMarker = L.marker([skyTraceTestAircraft.latitude, skyTraceTestAircraft.longitude], {icon: aircraftIcon}).addTo(skyTraceMap)
+aircraftMarker.on("click", () => {
+  showSkyTraceAircraftPanel(skyTraceTestAircraft)})
