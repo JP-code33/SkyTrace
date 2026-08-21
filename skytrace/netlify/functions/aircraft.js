@@ -1,5 +1,7 @@
 export default async () => {
-    return Response.json({
-        success:true, message: "skyTrace netlify function is working"
-    })
+    return new Response(
+        JSON.stringify({
+            success: true, message: "SKyTrace is working"
+        }), {headers: {"Content-Type": "applications/json"}}
+    )
 }
