@@ -201,3 +201,92 @@ body {
   height: 40px;
   display: block;
 }
+
+.skyTraceAirportPanel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  padding: 20px;
+  background: rgba(18, 25, 32, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  color: white;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: 0.2s ease, transform 0.2s ease;
+}
+
+.skyTraceAirportPanel.open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.skyTraceAirportPanelClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border: none; border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.skyTraceAirportPanelClose:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.skyTracePanelTitle {
+  margin-bottom: 6px;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.skyTraceAirportPanel h2 {
+  margin: 0 30px 16px 0;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.skyTraceAirportCode {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.skyTraceAirportCode span {
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.skyTraceAirportInfo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.skyTraceAirportInfo div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skyTraceAirportInfo span {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.skyTraceAirportInfo strong {
+  font-size: 13px;
+  font-weight: 600;
+}

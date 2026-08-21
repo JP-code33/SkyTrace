@@ -3,6 +3,8 @@ import "./style.css"
 import L from "leaflet"
 //import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
 import planeIcon from "./assets/planeIcon.png"
+import { airportData } from "./airports/airportData"
+import airportIcon from "./assets/airportMarker.png"
 
 
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
@@ -181,4 +183,51 @@ const testAircraft = [
 }
 ]
 
+function showAirportPanel(airport) {
+  document.getElementById("skyTraceAirportName").textContent = airport.name || "Unknown Airport"
+  document.getElementById("skyTraceAirportIATA").textContent = airport.iata || "---"
+  document.getElementById("skyTraceAirportICAO").textContent = airport.icao || "---"
+  document.getElementById("skyTraceAirportCity").textContent = airport.city || "N/A"
+  document.getElementById("skyTraceAirportCountry").textContent = airport.country || "N/A"
+  document.getElementById("skyTraceAirportElevation").textContent = airport.elevation != null ? `${airport.elevation}ft` : "N/A"
+  document.getElementById("skyTraceAirportPanel").classList.add("open")
+}
+
+function closeAirportPanel () {
+  document.getElementById("skyTraceAirportPanel").classList.remove("open")
+}
+
+window.showAirportPanel = showAirportPanel
+window.closeAirportPanel = closeAirportPanel
+
 updateAircraftMarkers(testAircraft)
+
+const airportMarkers = new Map()
+
+function createAirportIcon() {
+  return L.divIcon({
+    className: "skyTraceAirportIcon",
+    html:`<img src="${airportIcon}" alt="Airport" style="width: 28px; height: 28px; display: block">`, iconSize: [28, 28], iconAnchor: [10, 10]
+  })
+}
+
+function updateAirportMarkers(airports) {
+  airports.forEach((airport) => {
+    if(airport.latitude == null || airport.longitude == null || airport.id == null) {
+      return
+    }
+
+    if(airportMarkers.has(airport.id)) {
+      return
+    }
+
+    const marker = L.marker([airport.latitude, airport.longitude], {icon: createAirportIcon()}).addTo(skyTraceMap)  
+    marker.on("click", () => {
+      console.log("airport clicked:", airport)
+      showAirportPanel(airport)
+    })
+    airportMarkers.set(airport.id, marker)
+  })
+}
+
+updateAirportMarkers(airportData)
