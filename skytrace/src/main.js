@@ -3,11 +3,15 @@ import "./style.css"
 import L from "leaflet"
 //import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
 import planeIcon from "./assets/planeIcon.png"
-import { airportData } from "./airports/airportData"
 import airportIcon from "./assets/airportMarker.png"
+import largeAirports from "./data/largeAirports.json"
+import mediumAirports from "./data/mediumAirports.json"
 
 
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
+skyTraceMap.on("click", () => {
+  closeSkyTraceAircraftPanel()
+})
 
 const skyTraceStandardMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreeMap contributors"
@@ -97,12 +101,18 @@ function showSkyTraceAircraftPanel(aircraft) {
   document.getElementById("skyTraceAircraftPanel").classList.add("open")
 }
 
+
 function closeSkyTraceAircraftPanel() {
-  document.getElementById("skyTraceAircraftPanel").classList.remove("open")
+  const panel = document.getElementById("skyTraceAircraftPanel")
+  if(panel) {
+    panel.classList.remove("open")
+    return
+  }
 }
 
 window.showSkyTraceAircraftPanel = showSkyTraceAircraftPanel
 window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
+
 
 const aircraftMarkers = new Map()
 function createAircraftIcon(heading) {
@@ -129,12 +139,13 @@ function updateAircraftMarkers(aircraftList) {
           icon: createAircraftIcon(aircraft.heading)}).addTo(skyTraceMap)
       
           marker.on("click", () => {
+            L.DomEvent.stopPropagation(aircraft)
         showSkyTraceAircraftPanel(aircraft)
       })
       
       aircraftMarkers.set(aircraft.id, marker)
     } else {
-      marker.setLatLng([aircraft.latitude, aircraft.longtitude])
+      marker.setLatLng([aircraft.latitude, aircraft.longitude])
       marker.setIcon(createAircraftIcon(aircraft.heading))
     }
   })
@@ -207,27 +218,50 @@ const airportMarkers = new Map()
 function createAirportIcon() {
   return L.divIcon({
     className: "skyTraceAirportIcon",
-    html:`<img src="${airportIcon}" alt="Airport" style="width: 28px; height: 28px; display: block">`, iconSize: [28, 28], iconAnchor: [10, 10]
+    html:`<img src="${airportIcon}" alt="Airport" style="width: 12px; height: 12px; display: block">`, iconSize: [12, 12], iconAnchor: [6, 6]
   })
 }
 
 function updateAirportMarkers(airports) {
-  airports.forEach((airport) => {
-    if(airport.latitude == null || airport.longitude == null || airport.id == null) {
-      return
-    }
-
-    if(airportMarkers.has(airport.id)) {
-      return
-    }
-
-    const marker = L.marker([airport.latitude, airport.longitude], {icon: createAirportIcon()}).addTo(skyTraceMap)  
+ const visibleAirportIds = new Set()
+ const mapBounds = skyTraceMap.getBounds()
+ airports.forEach((airport) => {
+  if(airport.latitude == null || airport.longitude == null || airport.id == null) {
+    return
+  }
+  if(!mapBounds.contains([airport.latitude, airport.longitude])) {
+    return
+  }
+  visibleAirportIds.add(airport.id)
+  let marker = airportMarkers.get(airport.id)
+  if(!marker) {
+    marker = L.marker([airport.latitude, airport.longitude], {icon: createAirportIcon()}).addTo(skyTraceMap)
     marker.on("click", () => {
-      console.log("airport clicked:", airport)
+      L.DomEvent.stopPropagation(airport)
       showAirportPanel(airport)
     })
     airportMarkers.set(airport.id, marker)
-  })
+  }
+ })
+
+ airportMarkers.forEach((marker, airportId) => {
+  if(!visibleAirportIds.has(airportId)) {
+    skyTraceMap.removeLayer(marker)
+    airportMarkers.delete(airportId)
+  }
+ })
 }
 
-updateAirportMarkers(airportData)
+function updateVisibleAirports() {
+  const zoom = skyTraceMap.getZoom()
+  if(zoom <= 4) {
+    updateAirportMarkers(largeAirports.filter((airport) => airport.iata))
+  } else if (zoom <= 6) {
+    updateAirportMarkers(largeAirports)
+  } else {
+    updateAirportMarkers([...largeAirports, ...mediumAirports])
+  }
+}
+
+skyTraceMap.on("zoomend moveend", updateVisibleAirports)
+updateVisibleAirports()
