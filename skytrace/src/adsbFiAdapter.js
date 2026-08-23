@@ -1,11 +1,9 @@
-const ADSB_LOL_BASE_URL = "https://api.adsb.lol"
-
-export async function fetchSkyTraceAircraft(latitude, longitude) {
-    const url = `${ADSB_LOL_BASE_URL}/v2/lat/${latitude}/lon/${longitude}/dist/250`
+export async function fetchSkyTraceAircraft(latitude, longitude, distance = 250) {
+    const url = `https://sky-trace-qtiq.vercel.app/api/aircraft?lat=${latitude}&lon=${longitude}&dist=${distance}`
     const response = await fetch(url)
 
     if(!response.ok) {
-        throw new Error(`ADSB.lol API error: ${response.status}`)
+        throw new Error(`SkyTrace aircraft API error: ${response.status}`)
     }
     const data = await response.json()
     return(data.ac || [])

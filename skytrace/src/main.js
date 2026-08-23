@@ -1,7 +1,7 @@
 import "leaflet/dist/leaflet.css"
 import "./style.css"
 import L from "leaflet"
-//import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
+import {fetchSkyTraceAircraft} from "./adsbFiAdapter.js"
 import planeIcon from "./assets/planeIcon.png"
 import airportIcon from "./assets/airportMarker.png"
 import largeAirports from "./data/largeAirports.json"
@@ -211,7 +211,18 @@ function closeAirportPanel () {
 window.showAirportPanel = showAirportPanel
 window.closeAirportPanel = closeAirportPanel
 
-updateAircraftMarkers(testAircraft)
+async function loadSkyTraceAircraft() {
+  try {
+    const center = skyTraceMap.getCenter()
+    const aircraft = await fetchSkyTraceAircraft(center.lat, center.lng, 250)
+    updateAircraftMarkers(aircraft)
+    console.log(`SkyTrace: ${aircraft.length} aircraft loaded`)
+  } catch(error) {console.error("Failed to load SkyTrace aircraft:", error)}
+}
+
+loadSkyTraceAircraft()
+
+setInterval(loadSkyTraceAircraft, 15000)
 
 const airportMarkers = new Map()
 
