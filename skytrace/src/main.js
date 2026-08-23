@@ -158,42 +158,6 @@ function updateAircraftMarkers(aircraftList) {
   })
 }
 
-const testAircraft = [
-  {
-  id: "HELLO123",
-  callsign: "SKY345",
-  latitude: 39.8,
-  longitude: -98.5,
-  altitude: 35000,
-  speed: 567, 
-  heading: 275,
-  registration: "N123",
-  aircraftType: "B738"
-}, 
-{
-  id: "HELLO456",
-  callsign: "SKY123",
-  latitude: 41.2,
-  longitude: -96.2,
-  altitude: 28000,
-  speed: 430,
-  heading: 90,
-  registration: "N456",
-  aircraftType: "A380"
-},
-{
-  id: "HELLO789",
-  callsign: "SKY789",
-  latitude: 37.5,
-  longitude: -101.4,
-  altitude: 32000,
-  speed: 510,
-  heading: 180,
-  registration: "N789",
-  aircraftType: "A350"
-}
-]
-
 function showAirportPanel(airport) {
   document.getElementById("skyTraceAirportName").textContent = airport.name || "Unknown Airport"
   document.getElementById("skyTraceAirportIATA").textContent = airport.iata || "---"
