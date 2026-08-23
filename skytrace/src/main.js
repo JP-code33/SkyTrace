@@ -115,6 +115,7 @@ window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
 
 
 const aircraftMarkers = new Map()
+const aircraftAnimationFrames = new Map()
 function createAircraftIcon(heading) {
   return L.divIcon({
     className: "skyTraceAircraftIcon",
@@ -122,6 +123,32 @@ function createAircraftIcon(heading) {
     iconSize: [60, 60],
     iconAnchor: [30, 30]
   })
+}
+
+function animateAircraftMarker(marker, aircraftId, startPosition, endPosition, duration = 5000) {
+  const startTime = performance.now()
+  if(aircraftAnimationFrames.has(aircraftId)) {
+    cancelAnimationFrame(aircraftAnimationFrames.get(aircraftId))
+  }
+
+  function animate(currentTime) {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const smoothProgress = progress * progress * (3 - 2 * progress)
+    const latitude = startPosition[0] + (endPosition[0] - startPosition[0]) * smoothProgress
+    const longitude = startPosition[1] + (endPosition[1] - startPosition[1]) * smoothProgress
+    marker.setLatLng([latitude, longitude])
+
+    if(progress < 1) {
+      const frame = requestAnimationFrame(animate)
+      aircraftAnimationFrames.set(aircraftId, frame)
+    } else {
+      aircraftAnimationFrames.delete(aircraftId)
+    }
+  }
+
+  const frame = requestAnimationFrame(animate)
+  aircraftAnimationFrames.set(aircraftId, frame)
 }
 
 function updateAircraftMarkers(aircraftList) {
@@ -145,7 +172,9 @@ function updateAircraftMarkers(aircraftList) {
       
       aircraftMarkers.set(aircraft.id, marker)
     } else {
-      marker.setLatLng([aircraft.latitude, aircraft.longitude])
+      const currentPosition = marker.getLatLng()
+
+      animateAircraftMarker(marker, aircraft.id, [currentPosition.lat, currentPosition.lng], [aircraft.latitude, aircraft.longitude], 5000)
       marker.setIcon(createAircraftIcon(aircraft.heading))
     }
   })
@@ -205,7 +234,7 @@ async function loadSkyTraceAircraft() {
 
 loadSkyTraceAircraft()
 
-setInterval(loadSkyTraceAircraft, 15000)
+setInterval(loadSkyTraceAircraft, 5000)
 
 const airportMarkers = new Map()
 
