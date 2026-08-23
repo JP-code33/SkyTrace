@@ -177,8 +177,27 @@ window.closeAirportPanel = closeAirportPanel
 
 async function loadSkyTraceAircraft() {
   try {
+    const zoom = skyTraceMap.getZoom()
+    if(zoom < 4){
+      updateAircraftMarkers([])
+      return
+    }
+
     const center = skyTraceMap.getCenter()
-    const aircraft = await fetchSkyTraceAircraft(center.lat, center.lng, 250)
+
+    let distance 
+    if(zoom === 4){
+      distance = 250
+    } else if (zoom === 5) {
+      distance = 200
+    } else if  (zoom === 6) {
+      distance = 150
+    } else {
+      distance = 100
+    }
+
+
+    const aircraft = await fetchSkyTraceAircraft(center.lat, center.lng, distance)
     updateAircraftMarkers(aircraft)
     console.log(`SkyTrace: ${aircraft.length} aircraft loaded`)
   } catch(error) {console.error("Failed to load SkyTrace aircraft:", error)}
