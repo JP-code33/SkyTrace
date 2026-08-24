@@ -7,33 +7,38 @@ export default async function handler(request, response) {
             })
         }
 
-        const routeURL = `https://api.adsbdb.com/v0/callsign/${encodeURIComponent(callsign)}`
-        const routeResponse = await fetch(routeURL)
+        const routeUrl = `https://api.adsbdb.com/v0/callsign/${encodeURIComponent(callsign)}`
+        console.log("Looking up:", routeUrl)
+        const routeResponse = await fetch(routeUrl)
+        const responseText = await routeResponse.text()
+        console.log("ADSBDB status:", routeResponse.status)
+        console.log("ADSBDB response:", responseText)
 
         if(!routeResponse.ok) {
             return response.status(routeResponse.status).json({
-                error: "ADSBDB route lookup failed"
+                error: "ADSBDB request failed",
+                status: routeResponse.status,
+                details: responseText
             })
         }
-
-        const data = await routeResponse.json()
+        const data = JSON.parse(responseText)
         const route = data.response?.flightroute
-
-        if(!reoute) {
-            return response.status(400).json({
+        
+        if(!route) {
+            return response.status(404).json({
                 error: "Route not found"
             })
         }
-
         return response.status(200).json({
             airline: route.airline?.name || null,
             origin: route.origin ? {name: route.origin.name, iata: route.origin.iata_code, icao: route.origin.icao_code} : null,
-            destination : route.destination ? {name: route.destination.name, iata: route.destination.iata_code, icao: route.destination.icao_code} : null
+            destination: route.destination ? {name: route.destination.name, iata: route.destination.iata_code, icao: route.destination.icao_code} : null,
         })
     } catch(error) {
-        console.error(error)
+        console.error("Route API error:", error)
         return response.status(500).json({
-            error: "Failed to fetch route data"
+            error: "Failed to fetch route data",
+            details: error.message
         })
     }
 }
