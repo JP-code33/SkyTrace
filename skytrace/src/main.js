@@ -137,6 +137,8 @@ const aircraftMarkers = new Map()
 const aircraftAnimationFrames = new Map()
 const aircraftTrails = new Map()
 let selectedAircraftRoute = null
+const skyTraceFlightSearch = document.getElementById("skyTraceFlightSearch")
+const skyTraceSearchResults = document.getElementById("skyTraceSearchResults")
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -216,6 +218,46 @@ function showSkyTraceAircraftRoute(aircraft) {
   ).addTo(skyTraceMap)
 }
 
+skyTraceFlightSearch.addEventListener("input", () => {
+  const searchValue = skyTraceFlightSearch.value.trim().toLowerCase()
+  skyTraceSearchResults.innerHTML = ""
+
+  if(!searchValue) {
+    return
+  }
+
+  const matches = []
+  aircraftMarkers.forEach((marker, aircraftId) => {
+    const aircraft = marker.skyTraceAircraft
+
+    if(!aircraft) {
+      return
+    }
+
+    const callsign = aircraft.callsign?.toLowerCase() || ""
+    const registration = aircraft.registration?.toLowerCase() || ""
+    const icao = aircraft.id?.toLowerCase() || ""
+
+    if(callsign.includes(searchValue) || registration.includes(searchValue) || icao.includes(searchValue)) {
+      matches.push(aircraft)
+    }
+  })
+
+  matches.slice(0, 8).forEach((aircraft) => {
+    const result = document.createElement("div")
+    result.className = "skyTraceSearchResult"
+    result.innerHTML = `<strong>${aircraft.callsign}</strong>
+    <span>${aircraft.registration || aircraft.id || "Unknown aircraft"}</span`
+
+    result.addEventListener("click", () => {
+      selectSkyTraceAircraft(aircraft) 
+      skyTraceFlightSearch.value = aircraft.callsign
+      skyTraceSearchResults.innerHTML = ""
+    })
+    skyTraceSearchResults.appendChild(result)
+  })
+})
+
 function updateAircraftMarkers(aircraftList) {
   const currentAircraftIds = new Set()
   aircraftList.forEach((aircraft) => {
@@ -231,6 +273,8 @@ function updateAircraftMarkers(aircraftList) {
       marker = L.marker([aircraft.latitude, aircraft.longitude], 
         {
           icon: createAircraftIcon(aircraft.heading)}).addTo(skyTraceMap)
+
+          marker.skyTraceAircraft = aircraft
       
           marker.on("click", () => {
             if(selectedAircraftId && selectedAircraftId !== aircraft.id) {
@@ -252,6 +296,7 @@ function updateAircraftMarkers(aircraftList) {
       
       aircraftMarkers.set(aircraft.id, marker)
     } else {
+      marker.skyTraceAircraft = aircraft
       const currentPosition = marker.getLatLng()
 
       animateAircraftMarker(marker, aircraft.id, [currentPosition.lat, currentPosition.lng], [aircraft.latitude, aircraft.longitude], 5000)

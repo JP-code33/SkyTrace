@@ -325,3 +325,63 @@ body {
   color: white;
   font-size: 14px;
 }
+
+.skyTraceSearchPanel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  z-index: 1000;
+}
+
+#skyTraceFlightSearch {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(10, 18, 28, 0.94);
+  color: white;
+  font-size: 13px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+#skyTraceFlightSearch::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#skyTraceFlightSearch:focus {
+  border-color: rgba(77, 163, 255, 0.7);
+}
+
+.skyTraceSearchResults {
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.skyTraceSearchResult {
+  padding: 11px 13px;
+  background: rgba(10, 18, 28, 0.94);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.skyTraceSearchResult:hover {
+  background: rgba(77, 163, 255, 0.2);
+}
+
+.skyTraceSearchResult strong {
+  display: block;
+  font-size: 13px;
+}
+
+.skyTraceSearchResult span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+}
