@@ -176,12 +176,12 @@ function createAircraftTrail(aircraftId, latitude, longitude) {
     aircraftTrails.set(aircraftId, trail)
   }
 
-  const points = trail.getLatLng()
+  const points = trail.getLatLngs()
   points.push([latitude, longitude])
   if(points.length > 20) {
     points.shift()
   }
-  trail.setLatLng(points)
+  trail.setLatLngs(points)
 }
 
 function updateAircraftMarkers(aircraftList) {
