@@ -12,7 +12,13 @@ async function fetchSkyTraceRoute(callsign) {
     try{
         const response = await fetch(`https://sky-trace-qtiq.vercel.app/api/route?callsign=${encodeURIComponent(callsign)}`)
 
+        if(response.status === 404) {
+            routeCache.set(callsign, null)
+            return null
+        }
+
         if(!response.ok) {
+            console.error(`Route API error for ${callsign}: ${response.status}`)
             return null
         }
         const route = await response.json()
