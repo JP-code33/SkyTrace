@@ -130,6 +130,7 @@ window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
 const aircraftMarkers = new Map()
 const aircraftAnimationFrames = new Map()
 const aircraftTrails = new Map()
+let selectedAircraftRoute = null
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -185,6 +186,28 @@ function createAircraftTrail(aircraftId, latitude, longitude) {
     points.shift()
   }
   trail.setLatLngs(points)
+}
+
+function showSkyTraceAircraftRoute(aircraft) {
+  if(selectedAircraftRoute) {
+    skyTraceMap.removeLayer(selectedAircraftRoute)
+    selectedAircraftRoute = null
+  }
+  if(!aircraft.origin || !aircraft.destination) {
+    return
+  }
+  const originLat = aircraft.origin.latitude
+  const originLon = aircraft.origin.longitude
+  const destinationLat = aircraft.destination.latitude
+  const destinationLon = aircraft.destination.longitude
+
+  if(originLat == null || originLon == null || destinationLat == null || destinationLon == null) {
+    return
+  }
+
+  selectedAircraftRoute = L.polyline(
+    [[originLat, originLon], [destinationLat, destinationLon]], {color: "#4da3ff", weight: 3, opacity: 0.75, dashArray: "8 8"}
+  ).addTo(skyTraceMap)
 }
 
 function updateAircraftMarkers(aircraftList) {

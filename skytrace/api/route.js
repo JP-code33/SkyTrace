@@ -31,8 +31,8 @@ export default async function handler(request, response) {
         }
         return response.status(200).json({
             airline: route.airline?.name || null,
-            origin: route.origin ? {name: route.origin.name, iata: route.origin.iata_code, icao: route.origin.icao_code} : null,
-            destination: route.destination ? {name: route.destination.name, iata: route.destination.iata_code, icao: route.destination.icao_code} : null,
+            origin: route.origin ? {name: route.origin.name, iata: route.origin.iata_code, icao: route.origin.icao_code, latitude: route.origin.latitude, longitude: route.origin.longitude} : null,
+            destination: route.destination ? {name: route.destination.name, iata: route.destination.iata_code, icao: route.destination.icao_code, latitude: route.destination.latitude, longitude: route.destination.longitude} : null,
         })
     } catch(error) {
         console.error("Route API error:", error)
