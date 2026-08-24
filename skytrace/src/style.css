@@ -204,6 +204,13 @@ body {
   display: block;
 }
 
+#skyTraceAircraftAirline {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin-top: -12px;
+  margin-bottom: 18px;
+}
+
 .skyTraceAirportPanel {
   position: absolute;
   top: 20px;
