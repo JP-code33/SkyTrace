@@ -22,7 +22,8 @@ const airlinePrefixes = {
     ETD: "Etihad Airways",
     AIC: "Air India",
     ASA: "Alaska Airlines",
-    JBU: "JetBlue"
+    JBU: "JetBlue",
+    IGO: "IndiGo"
 }
 
 export async function fetchSkyTraceAircraft(latitude, longitude, distance = 250) {
