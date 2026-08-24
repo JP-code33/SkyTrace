@@ -237,6 +237,7 @@ function updateAircraftMarkers(aircraftList) {
 
             selectedAircraftId = aircraft.id
             showSkyTraceAircraftPanel(aircraft)
+            showSkyTraceAircraftRoute(aircraft)
             const trail = aircraftTrails.get(aircraft.id)
             if(trail) {
               trail.addTo(skyTraceMap)
