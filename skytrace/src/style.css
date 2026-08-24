@@ -115,29 +115,33 @@ body {
 
 .skyTraceAircraftPanel {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 0px;
+  left: 0px;
   z-index: 1000;
-  width: 200px;
-  padding: 20px;
+  width: 320px;
+  height: 100%;
+  padding: 24px;
   background: rgba(10, 18, 28, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   display: none;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
 }
 
 .skyTraceAircraftPanel.open {
-  display: block;
+  transform: translateX(0);
 }
 
 .skyTraceAircraftPanelClose {
   position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 26px;
-  height: 26px;
+  right: 14px;
+  top: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   text-align: center;
   font-size: 16px;
   line-height: 26px;
@@ -161,9 +165,9 @@ body {
 }
 
 .skyTraceAircraftPanel h2 {
-  margin: 0 0 14px;
+  margin: 35 0 20px;
   color: white;
-  font-size: 22px;
+  font-size: 26px;
 }
 
 .skyTraceAircraftGrid {
