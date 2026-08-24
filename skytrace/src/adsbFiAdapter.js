@@ -1,29 +1,27 @@
-const airlinePrefixes = {
-    AAL: "American Airlines",
-    DAL: "Delta Air Lines",
-    UAL: "United Airlines",
-    SWA: "Southwest Airlines",
-    BAW: "British Airways",
-    ACA: "Air Canada",
-    AFR: "Air France",
-    KLM: "KLM",
-    DLH: "Lufthansa",
-    UAE: "Emirates",
-    QTR: "Qatar Airways", 
-    QFA: "Qantas",
-    ANA: "All Nippon Airways",
-    JAL: "Japan Airlines",
-    WJA: "WestJet",
-    RYR: "Ryanair",
-    EZY: "easyJet",
-    SIA: "Singapore Airlines",
-    KAL: "Korean Airlines",
-    THY: "Turkish Airlines",
-    ETD: "Etihad Airways",
-    AIC: "Air India",
-    ASA: "Alaska Airlines",
-    JBU: "JetBlue",
-    IGO: "IndiGo"
+const routeCache = new Map()
+
+async function fetchSkyTraceRoute(callsign) {
+    if(!callsign || callsign === "Unknown") {
+        return null
+    }
+
+    if(routeCache.has(callsign)) {
+        return routeCache.get(callsign)
+    }
+
+    try{
+        const response = await fetch(`https://sky-trace-qtiq.vercel.app/api/route?callsign=${encodeURIComponent(callsign)}`)
+
+        if(!response.ok) {
+            return null
+        }
+        const route = await response.json()
+        routeCache.set(callsign, route)
+        return route
+    } catch(error) {
+        console.error(`Failed to load route for ${callsign}:`, error)
+        return null
+    }
 }
 
 export async function fetchSkyTraceAircraft(latitude, longitude, distance = 250) {
@@ -34,18 +32,26 @@ export async function fetchSkyTraceAircraft(latitude, longitude, distance = 250)
         throw new Error(`SkyTrace aircraft API error: ${response.status}`)
     }
     const data = await response.json()
-    return(data.ac || [])
+    const aircraftList = (data.ac || [])
     .filter(aircraft => aircraft.lat !== undefined && aircraft.lon !== undefined)
     .map(aircraft => {
         const callsign = aircraft.flight?.trim() || "Unknown"
-        const airlineCode = callsign.substring(0, 3)
-        const airline = airlinePrefixes[airlineCode] || "Unknown"
 
         return{
         id: aircraft.hex, 
-        callsign: callsign, airline: airline,
+        callsign: callsign,
         latitude: aircraft.lat, longitude: aircraft.lon, altitude: aircraft.alt_baro, speed: aircraft.gs,
         heading: aircraft.track, registration: aircraft.r, aircraftType: aircraft.t
         }
     })
+
+    const aircraftWithRoutes = await Promise.all(
+        aircraftList.map(async(aircraft) => {
+            const route = await fetchSkyTraceRoute(aircraft.callsign)
+            return{
+                ...aircraft, airline: route?.airline || "Unknown Airline", origin: route?.origin || null, destination: route?.destination || null
+            }
+        })
+    )
+    return aircraftWithRoutes
 }
