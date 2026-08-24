@@ -8,7 +8,7 @@ export default async function handler(request, response) {
         }
 
         const routeURL = `https://api.adsbdb.com/v0/callsign/${encodeURIComponent(callsign)}`
-        const routeResponse = await fetch(routeUrl)
+        const routeResponse = await fetch(routeURL)
 
         if(!routeResponse.ok) {
             return response.status(routeResponse.status).json({
