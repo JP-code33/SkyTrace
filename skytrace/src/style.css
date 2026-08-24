@@ -386,3 +386,41 @@ body {
   color: rgba(255, 255, 255, 0.55);
   font-size: 11px;
 }
+
+.skyTraceSelectedAircraft {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skyTraceSelectedAircraft img {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  z-index: 2;
+}
+
+.skyTraceSelectedAircraftRing {
+  position: absolute;
+  width: 62px;
+  height: 62px;
+  border: 2px solid #4da3ff;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #4da3ff;
+  animation: skyTraceSelectedPulse 1.5s infinite
+}
+
+@keyframes skyTraceSeletectedPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+

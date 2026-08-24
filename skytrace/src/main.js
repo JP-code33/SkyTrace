@@ -312,6 +312,40 @@ function updateAircraftMarkers(aircraftList) {
   })
 }
 
+function selectSkyTraceAircraft(aircraft) {
+  selectedAircraftId = aircraft.id
+  skyTraceMap.setView([aircraft.latitude, aircraft.longitude], Math.max(skyTraceMap.getZoom(), 7), {
+    animate: true, duration: 1
+  })
+
+  const marker = aircraftMarkers.get(aircraft.id)
+
+  if(marker) {
+    marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
+  }
+
+  showSkyTraceAircraftPanel(aircraft)
+  showSkyTraceAircraftRoute(aircraft.id)
+  if(trail) {
+    trail.addTo(skyTraceMap)
+  }
+}
+
+function createSelectedAircraftIcon(heading) {
+  return L.divIcon({
+    className: "skyTraceSelectedAircraftIcon",
+    html: `
+    <div class="skyTraceSelectedAircraft">
+      <div class="skyTraceSelectedAircraftRing"></div>
+      <img
+        src="${planeIcon}"
+        alt="Selected Aircraft"
+        style="transform: rotate(${heading || 0}deg)"
+    </div>`,
+    iconSize: [70, 70], iconAnchor: [35, 35]
+  })
+}
+
 function showAirportPanel(airport) {
   document.getElementById("skyTraceAirportName").textContent = airport.name || "Unknown Airport"
   document.getElementById("skyTraceAirportIATA").textContent = airport.iata || "---"
