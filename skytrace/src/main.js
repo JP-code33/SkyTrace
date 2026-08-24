@@ -12,6 +12,12 @@ const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
 
 skyTraceMap.on("click", () => {
   closeSkyTraceAircraftPanel()
+
+  if(selectedAircraftRoute) {
+    skyTraceMap.removeLayer(selectedAircraftRoute)
+    selectedAircraftRoute = null
+  }
+
   if(selectedAircraftId) {
     const trail = aircraftTrails.get(selectedAircraftId)
     if(trail) {
