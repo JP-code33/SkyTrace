@@ -9,8 +9,16 @@ import mediumAirports from "./data/mediumAirports.json"
 
 
 const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
+
 skyTraceMap.on("click", () => {
   closeSkyTraceAircraftPanel()
+  if(selectedAircraftId) {
+    const trail = aircraftTrails.get(selectedAircraftId)
+    if(trail) {
+      skyTraceMap.removeLayer(trail)
+    }
+    selectedAircraftId = null
+  }
 })
 
 const skyTraceStandardMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -90,6 +98,8 @@ async function toggleSkyTraceRadar() {
 
 window.toggleSkyTraceRadar = toggleSkyTraceRadar
 
+let selectedAircraftId = null
+
 function showSkyTraceAircraftPanel(aircraft) {
   document.getElementById("skyTraceAircraftCallsign").textContent = aircraft.callsign || "Unknown"
   document.getElementById("skyTraceAircraftAltitude").textContent = aircraft.altitude != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
@@ -116,6 +126,8 @@ window.closeSkyTraceAircraftPanel = closeSkyTraceAircraftPanel
 
 const aircraftMarkers = new Map()
 const aircraftAnimationFrames = new Map()
+const aircraftTrails = new Map()
+
 function createAircraftIcon(heading) {
   return L.divIcon({
     className: "skyTraceAircraftIcon",
@@ -151,6 +163,27 @@ function animateAircraftMarker(marker, aircraftId, startPosition, endPosition, d
   aircraftAnimationFrames.set(aircraftId, frame)
 }
 
+function createAircraftTrail(aircraftId, latitude, longitude) {
+  let trail = aircraftTrails.get(aircraftId)
+
+  if(!trail) {
+    trail = L.polyline([], {
+      color: "#4da3ff", 
+      weight: 2, 
+      opacity: 0.65,
+      smoothFactor: 1
+    })
+    aircraftTrails.set(aircraftId, trail)
+  }
+
+  const points = trail.getLatLng()
+  points.push([latitude, longitude])
+  if(points.length > 20) {
+    points.shift()
+  }
+  trail.setLatLng(points)
+}
+
 function updateAircraftMarkers(aircraftList) {
   const currentAircraftIds = new Set()
   aircraftList.forEach((aircraft) => {
@@ -159,15 +192,29 @@ function updateAircraftMarkers(aircraftList) {
     }
 
     currentAircraftIds.add(aircraft.id)
+    createAircraftTrail(aircraft.id, aircraft.latitude, aircraft.longitude)
     let marker = aircraftMarkers.get(aircraft.id)
+
     if(!marker) {
       marker = L.marker([aircraft.latitude, aircraft.longitude], 
         {
           icon: createAircraftIcon(aircraft.heading)}).addTo(skyTraceMap)
       
           marker.on("click", () => {
-            L.DomEvent.stopPropagation(aircraft)
-        showSkyTraceAircraftPanel(aircraft)
+            if(selectedAircraftId && selectedAircraftId !== aircraft.id) {
+              const previousTrail = aircraftTrails.get(selectedAircraftId)
+
+              if(previousTrail) {
+                skyTraceMap.removeLayer(previousTrail)
+              }
+            }
+
+            selectedAircraftId = aircraft.id
+            showSkyTraceAircraftPanel(aircraft)
+            const trail = aircraftTrails.get(aircraft.id)
+            if(trail) {
+              trail.addTo(skyTraceMap)
+            }
       })
       
       aircraftMarkers.set(aircraft.id, marker)
@@ -260,7 +307,6 @@ function updateAirportMarkers(airports) {
   if(!marker) {
     marker = L.marker([airport.latitude, airport.longitude], {icon: createAirportIcon()}).addTo(skyTraceMap)
     marker.on("click", () => {
-      L.DomEvent.stopPropagation(airport)
       showAirportPanel(airport)
     })
     airportMarkers.set(airport.id, marker)
