@@ -102,6 +102,7 @@ let selectedAircraftId = null
 
 function showSkyTraceAircraftPanel(aircraft) {
   document.getElementById("skyTraceAircraftCallsign").textContent = aircraft.callsign || "Unknown"
+  document.getElementById("skyTraceAircraftAirline").textContent = aircraft.airline || "Unknown Airline"
   document.getElementById("skyTraceAircraftAltitude").textContent = aircraft.altitude != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
   document.getElementById("skyTraceAircraftSpeed").textContent = aircraft.speed != null ? `${Math.round(aircraft.speed)}kt` : "N/A"
   document.getElementById("skyTraceAircraftHeading").textContent = aircraft.heading !=null ? `${Math.round(aircraft.heading)}°` : "N/A"
