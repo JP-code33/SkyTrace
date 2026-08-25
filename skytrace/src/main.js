@@ -378,10 +378,16 @@ function selectSkyTraceAircraft(aircraft) {
 
 let skyTraceReplayAnimation = null
 let skyTraceReplayRunning = false
-let skyTracReplayIndex = 0
+let skyTraceReplayIndex = 0
 let skyTraceReplaySpeed = 1
 let skyTraceReplayStartTime = 0
 let skyTraceReplaySegmentDuration = 500
+
+function formatSkyTraceReplayTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = Math.floor(totalSeconds % 60)
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  }
 
 function replaySkyTraceAircraft() {
   if(!selectedAircraftId) {
@@ -411,23 +417,17 @@ function replaySkyTraceAircraft() {
   skyTraceReplayIndex = 0
   let segmentStartTime = performance.now()
   skyTraceReplayTimeline.max = history.length - 1
-  skyTraceReplayTimeline.value - 0
+  skyTraceReplayTimeline.value = 0
   
   skyTraceReplayTotalTime.textContent = formatSkyTraceReplayTime((history.length - 1) * 5)
   skyTraceReplayPlayPause.textContent = "Pause"
-
-  function formatSkyTraceReplayTime(totalSeconds) {
-    const minutes = Math.floor(totalSeconds / 60)
-    const seconds = Math.floor(totalSeconds % 60)
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-  }
 
   function animateReplay(currentTime) {
     if(!skyTraceReplayRunning) {
       return
     }
 
-    if(historyIndex >= history.length - 1) {
+    if(skyTraceReplayIndex  >= history.length - 1) {
       const finalPoint = history[history.length - 1]
       marker.setLatLng([finalPoint.latitude, finalPoint.longitude])
       skyTraceMap.panTo([finalPoint.latitude, finalPoint.longitude], {animate: false})
@@ -444,9 +444,9 @@ function replaySkyTraceAircraft() {
 
     const currentPoint = history[skyTraceReplayIndex]
     const nextPoint = history[skyTraceReplayIndex + 1]
-    const elapsed = skyTraceReplayStartTime
+    const elapsed = currentTime - skyTraceReplayStartTime
     const duration = skyTraceReplaySegmentDuration / skyTraceReplaySpeed
-    const progress = Math.min(elapsed / segmentDuration, 1)
+    const progress = Math.min(elapsed / Duration, 1)
     const smoothProgress = progress * progress * (3 - 2 * progress)
     const latitude = currentPoint.latitude + (nextPoint.latitude - currentPoint.latitude) * smoothProgress
     const longitude = currentPoint.longitude + (nextPoint.longitude - currentPoint.longitude) * smoothProgress
@@ -530,9 +530,9 @@ skyTraceReplayPlayPause.addEventListener("click", () => {
       skyTraceMap.panTo([latitude, longitude], {animate: false})
 
       skyTraceReplayTimeline.value = skyTraceReplayIndex + progress
-      skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((skyTracReplayIndex + progress) * 5)
+      skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((skyTraceReplayIndex + progress) * 5)
       if(progress >= 1) {
-        skyTracReplayIndex++
+        skyTraceReplayIndex++
         skyTraceReplayStartTime = currentTime
       }
       skyTraceReplayAnimation = requestAnimationFrame(resumeReplay)
@@ -548,7 +548,7 @@ skyTraceReplayRestart.addEventListener("click", () => {
     return
   }
 
-  if(skyTracReplayAnimation) {
+  if(skyTraceReplayAnimation) {
     cancelAnimationFrame(skyTraceReplayAnimation)
   }
 
@@ -586,7 +586,7 @@ skyTraceReplayTimeline.addEventListener("input", () => {
 
   const value = Number(skyTraceReplayTimeline.value)
   const index = Math.floor(value)
-  const point = history[Math.min(index, history.length)]
+  const point = history[Math.min(index, history.length - 1)]
   const marker = aircraftMarkers.get(selectedAircraftId)
 
   if(marker) {
