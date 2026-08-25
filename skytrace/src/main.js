@@ -156,7 +156,7 @@ const skyTraceReplayCurrentTime = document.getElementById("skyTraceReplayCurrent
 const skyTraceReplayTotalTime = document.getElementById("skyTraceReplayTotalTime")
 const skyTraceReplayPlayPause = document.getElementById("skyTraceReplayPlayPause")
 const skyTraceReplayRestart = document.getElementById("skyTraceReplayRestart")
-const skyTraceReplaySpeedButtons = document.getElementById("skyTraceReplaySpeedButtons")
+const skyTraceReplaySpeedButtons = document.querySelectorAll("#skyTraceReplaySpeedButtons buttons")
 
 function createAircraftIcon(heading) {
   return L.divIcon({
