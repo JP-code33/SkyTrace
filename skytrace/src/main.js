@@ -148,6 +148,7 @@ const aircraftTrails = new Map()
 let selectedAircraftRoute = null
 const skyTraceFlightSearch = document.getElementById("skyTraceFlightSearch")
 const skyTraceSearchResults = document.getElementById("skyTraceSearchResults")
+const aircraftHistory = new Map()
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -284,6 +285,18 @@ function updateAircraftMarkers(aircraftList) {
 
     currentAircraftIds.add(aircraft.id)
     createAircraftTrail(aircraft.id, aircraft.latitude, aircraft.longitude)
+
+    if(!aircraftHistory.has(aircraft.id)) {
+      aircraftHistory.set(aircraft.id, [])
+    }
+
+    const history = aircraftHistory.get(aircraft.id)
+    history.push({latitude: aircraft.latitude, longitude: aircraft.longitude, altitude: aircraft.altitude, speed: aircraft.speed, heading: aircraft.heading, timestamp: Date.now()})
+    if(history.length > 60) {
+      history.shift()
+    }
+    console.log("SkyTrace History:", aircraft.id, aircraftHistory.get(aircraft.id))
+
     let marker = aircraftMarkers.get(aircraft.id)
 
     if(!marker) {
