@@ -433,3 +433,48 @@ body {
   }
 }
 
+.skyTraceReplayControls {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.skyTraceReplayTime {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+}
+
+#skyTraceReplayTimeline {
+  width: 100%;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #4da3ff;
+}
+
+.skyTraceReplayButtons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.skyTraceReplayButtons button {
+  border: none;
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+}
+
+.skyTraceReplayButtons button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.skyTraceReplayButtons .active {
+  background: rgba(77, 163, 255, 0.25);
+}

@@ -33,6 +33,29 @@
       <div id="skyTraceAircraftAirline">Unknown Airline</div>
       <button id="skyTraceReplayButton">Replay Flight</button>
 
+      <div class="skyTraceReplayControls" id="skyTraceReplayControls">
+
+        <div class="skyTraceReplayTime">
+          <span id="skyTraceReplayCurrentTime">00:00</span>
+          <span id="skyTraceReplayTotalTime">00:00</span>
+        </div>
+
+        <input
+          type="range"
+          id="skyTraceReplayTimeline"
+          min="0"
+          max="100"
+          value="0">
+
+          <div class="skyTraceReplayButtons">
+            <button id="skyTraceReplayRestart">Restart</button>
+            <button id="skyTraceReplayPlayPause">Play</button>
+            <button class="skyTraceReplaySpeed active" data-speed="1">1x</button>
+            <button class="skyTraceReplaySpeed active" data-speed="2">2x</button>
+            <button class="skyTraceReplaySpeed active" data-speed="3">3x</button>
+          </div>
+      </div>
+
       <div class="skyTraceAircraftRoute">
         <div>
           <span>From</span>

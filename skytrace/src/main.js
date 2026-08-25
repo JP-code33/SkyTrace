@@ -150,6 +150,13 @@ const skyTraceFlightSearch = document.getElementById("skyTraceFlightSearch")
 const skyTraceSearchResults = document.getElementById("skyTraceSearchResults")
 const aircraftHistory = new Map()
 const skyTraceReplayButton = document.getElementById("skyTraceReplayButton")
+const skyTraceReplayControls = document.getElementById("skyTraceReplayControls")
+const skyTraceReplayTimeline = document.getElementById("skyTraceReplayTimeline")
+const skyTraceReplayCurrentTime = document.getElementById("skyTraceReplayCurrentTime")
+const skyTraceReplayTotalTime = document.getElementById("skyTraceReplayTotalTime")
+const skyTraceReplayPlayPause = document.getElementById("skyTraceReplayPlayPause")
+const skyTraceReplayRestart = document.getElementById("skyTraceReplayRestart")
+const skyTraceReplaySpeedButtons = document.getElementById("skyTraceReplaySpeedButtons")
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -371,6 +378,10 @@ function selectSkyTraceAircraft(aircraft) {
 
 let skyTraceReplayAnimation = null
 let skyTraceReplayRunning = false
+let skyTracReplayIndex = 0
+let skyTraceReplaySpeed = 1
+let skyTraceReplayStartTime = 0
+let skyTraceReplaySegmentDuration = 500
 
 function replaySkyTraceAircraft() {
   if(!selectedAircraftId) {
@@ -386,6 +397,7 @@ function replaySkyTraceAircraft() {
   }
 
   const marker = aircraftMarkers.get(selectedAircraftId)
+  
   if(!marker) {
     return
   }
@@ -396,9 +408,19 @@ function replaySkyTraceAircraft() {
 
   skyTraceFollowAircraft = false
   skyTraceReplayRunning = true
-  let historyIndex = 0
+  skyTraceReplayIndex = 0
   let segmentStartTime = performance.now()
-  const segmentDuration = 500
+  skyTraceReplayTimeline.max = history.length - 1
+  skyTraceReplayTimeline.value - 0
+  
+  skyTraceReplayTotalTime = formatSkyTraceReplayTime((history.length - 1) * 5)
+  skyTraceReplayPlayPause.textContent = "Pause"
+
+  function formatSkyTraceReplayTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = Math.floor(totalSeconds % 60)
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  }
 
   function animateReplay(currentTime) {
     if(!skyTraceReplayRunning) {
@@ -410,15 +432,20 @@ function replaySkyTraceAircraft() {
       marker.setLatLng([finalPoint.latitude, finalPoint.longitude])
       skyTraceMap.panTo([finalPoint.latitude, finalPoint.longitude], {animate: false})
 
+      skyTraceReplayTimeline.value = history.length - 1
+      skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((history.length - 1) * 5)
+
       skyTraceReplayRunning = false
       skyTraceReplayAnimation = null
+      skyTraceReplayPlayPause.textContent = "Play"
       console.log("SkyTrace: Replay finished")
       return
     }
 
-    const currentPoint = history[historyIndex]
-    const nextPoint = history[historyIndex + 1]
-    const elapsed = currentTime - segmentStartTime
+    const currentPoint = history[skyTraceReplayIndex]
+    const nextPoint = history[skyTraceReplayIndex + 1]
+    const elapsed = skyTraceReplayStartTime
+    const duration = skyTraceReplaySegmentDuration / skyTraceReplaySpeed
     const progress = Math.min(elapsed / segmentDuration, 1)
     const smoothProgress = progress * progress * (3 - 2 * progress)
     const latitude = currentPoint.latitude + (nextPoint.latitude - currentPoint.latitude) * smoothProgress
@@ -426,9 +453,13 @@ function replaySkyTraceAircraft() {
 
     marker.setLatLng([latitude, longitude])
     skyTraceMap.panTo([latitude, longitude], {animate: false})
+
+    skyTraceReplayTimeline.value = skyTraceReplayTimeline.value = skyTraceReplayIndex + progress
+    skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((skyTraceReplayIndex + progress) * 5)
+
     if(progress >= 1) {
-      historyIndex++
-      segmentStartTime = currentTime
+      skyTraceReplayIndex++
+      skyTraceReplayStartTime = currentTime
     }
     skyTraceReplayAnimation = requestAnimationFrame(animateReplay)
   }
@@ -448,6 +479,122 @@ function stopSkyTraceReplay() {
 skyTraceReplayButton.addEventListener("click", () => {
   console.log("Replay button clicked")
   replaySkyTraceAircraft()
+})
+
+skyTraceReplayPlayPause.addEventListener("click", () => {
+  if(skyTraceReplayRunning) {
+    skyTraceReplayRunning = false
+
+    if(skyTraceReplayAnimation) {
+      cancelAnimationFrame(skyTraceReplayAnimation)
+      skyTraceReplayAnimation = null
+    }
+
+    skyTraceReplayPlayPause.textContent = "Play"
+  } else {
+    const history = aircraftHistory.get(selectedAircraftId)
+
+    if(!history || history.length < 2) {
+      return
+    }
+
+    skyTraceReplayRunning = true
+    skyTraceReplayStartTime = performance.now()
+    skyTraceReplayPlayPause.textContent = "Pause"
+
+    function resumeReplay(currentTime) {
+      if(!skyTraceReplayRunning) {
+        return
+      }
+
+      if(skyTraceReplayIndex >= history.length - 1) {
+        skyTraceReplayRunning = false
+        skyTraceReplayPlayPause.textContent = "Play"
+        return
+      }
+
+      const currentPoint = history[skyTraceReplayIndex]
+      const nextPoint = history[skyTraceReplayIndex + 1]
+
+      const elapsed = currentTime - skyTraceReplayStartTime
+      const duration = skyTraceReplaySegmentDuration / skyTraceReplaySpeed
+      const progress = Math.min(elapsed / duration, 1)
+      const smoothProgress = progress * progress * (3 - 2 * progress)
+      const latitude = currentPoint.latitude + (nextPoint.latitude - currentPoint.latitude) * smoothProgress
+      const longitude = currentPoint.longitude + (nextPoint.longitude - currentPoint.longitude) * smoothProgress
+      const marker = aircraftMarkers.get(selectedAircraftId)
+
+      if(marker) {
+        marker.setLatLng([latitude, longitude])
+      }
+      skyTraceMap.panTo([latitude, longitude], {animate: false})
+
+      skyTraceReplayTimeline.value = skyTraceReplayIndex + progress
+      skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((skyTracReplayIndex + progress) * 5)
+      if(progress >= 1) {
+        skyTracReplayIndex++
+        skyTraceReplayStartTime = currentTime
+      }
+      skyTraceReplayAnimation = requestAnimationFrame(resumeReplay)
+    }
+    skyTraceReplayAnimation = requestAnimationFrame(resumeReplay)
+  }
+})
+
+skyTraceReplayRestart.addEventListener("click", () => {
+  const history = aircraftHistory.get(selectedAircraftId)
+
+  if(!history || history.length < 2) {
+    return
+  }
+
+  if(skyTracReplayAnimation) {
+    cancelAnimationFrame(skyTraceReplayAnimation)
+  }
+
+  const marker = aircraftMarkers.get(selectedAircraftId)
+  if(marker) {
+    marker.setLatLng([
+      history[0].latitude,
+      history[0].longitude
+    ])
+  }
+
+  skyTraceReplayIndex = 0
+  skyTraceReplayTimeline.value = 0
+  skyTraceReplayCurrentTime.textContent = "00:00"
+  skyTraceReplayRunning = false
+  skyTraceReplayPlayPause.textContent = "Play"
+})
+
+skyTraceReplaySpeedButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    skyTraceReplaySpeed = Number(button.dataset.speed)
+    skyTraceReplaySpeedButtons.forEach((speedButton) => {
+      speedButton.classList.remove("active")
+    })
+
+    button.classList.add("active")
+  })
+})
+
+skyTraceReplayTimeline.addEventListener("input", () => {
+  const history = aircraftHistory.get(selectedAircraftId)
+  if(!history || history.length < 2) {
+    return
+  }
+
+  const value = Number(skyTraceReplayTimeline.value)
+  const index = Math.floor(value)
+  const point = history[Math.min(index, history.length)]
+  const marker = aircraftMarkers.get(selectedAircraftId)
+
+  if(marker) {
+    marker.setLatLng([point.latitude, point.longitude])
+  }
+  skyTraceMap.panTo([point.latitude, point.longitude], {animate: false})
+  skyTraceReplayIndex = Math.min(index, history.length - 2)
+  skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime(value * 5)
 })
 
 function createSelectedAircraftIcon(heading) {
