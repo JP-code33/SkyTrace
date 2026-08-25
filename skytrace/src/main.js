@@ -120,6 +120,13 @@ function showSkyTraceAircraftPanel(aircraft) {
   document.getElementById("skyTraceAircraftPanel").classList.add("open")
 }
 
+function updateSelectedAircraftPanel(aircraft) {
+  if(selectedAircraftId !== aircraft.id) {
+    return
+  }
+  showSkyTraceAircraftPanel(aircraft)
+}
+
 
 function closeSkyTraceAircraftPanel() {
   const panel = document.getElementById("skyTraceAircraftPanel")
@@ -265,6 +272,10 @@ function updateAircraftMarkers(aircraftList) {
       return
     }
 
+    if(aircraft.id === selectedAircraftId) {
+      updateSelectedAircraftPanel(aircraft)
+    }
+
     currentAircraftIds.add(aircraft.id)
     createAircraftTrail(aircraft.id, aircraft.latitude, aircraft.longitude)
     let marker = aircraftMarkers.get(aircraft.id)
@@ -300,7 +311,11 @@ function updateAircraftMarkers(aircraftList) {
       const currentPosition = marker.getLatLng()
 
       animateAircraftMarker(marker, aircraft.id, [currentPosition.lat, currentPosition.lng], [aircraft.latitude, aircraft.longitude], 5000)
-      marker.setIcon(createAircraftIcon(aircraft.heading))
+      if(aircraft.id === selectedAircraftId) {
+        marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
+      } else {
+        marker.setIcon(createAircraftIcon(aircraft.heading))
+      }
     }
   })
 
@@ -314,6 +329,7 @@ function updateAircraftMarkers(aircraftList) {
 
 function selectSkyTraceAircraft(aircraft) {
   selectedAircraftId = aircraft.id
+  marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
   skyTraceMap.setView([aircraft.latitude, aircraft.longitude], Math.max(skyTraceMap.getZoom(), 7), {
     animate: true, duration: 1
   })
@@ -325,7 +341,8 @@ function selectSkyTraceAircraft(aircraft) {
   }
 
   showSkyTraceAircraftPanel(aircraft)
-  showSkyTraceAircraftRoute(aircraft.id)
+  showSkyTraceAircraftRoute(aircraft)
+  const trail = aircraftTrails.get(aircraft.id)
   if(trail) {
     trail.addTo(skyTraceMap)
   }
