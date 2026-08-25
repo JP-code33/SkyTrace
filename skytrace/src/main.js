@@ -311,19 +311,17 @@ function updateAircraftMarkers(aircraftList) {
           marker.on("click", () => {
             if(selectedAircraftId && selectedAircraftId !== aircraft.id) {
               const previousTrail = aircraftTrails.get(selectedAircraftId)
-
               if(previousTrail) {
                 skyTraceMap.removeLayer(previousTrail)
               }
+              const previousMarker = aircraftMarkers.get(selectedAircraftId)
+              if(previousMarker) {
+                previousMarker.setIcon(
+                  createAircraftIcon.apply(previousMarker.skyTraceAircraft?.heading)
+                )
+              }
             }
-
-            selectedAircraftId = aircraft.id
-            showSkyTraceAircraftPanel(aircraft)
-            showSkyTraceAircraftRoute(aircraft)
-            const trail = aircraftTrails.get(aircraft.id)
-            if(trail) {
-              trail.addTo(skyTraceMap)
-            }
+            selectSkyTraceAircraft(aircraft)
       })
       
       aircraftMarkers.set(aircraft.id, marker)
@@ -351,17 +349,16 @@ function updateAircraftMarkers(aircraftList) {
 function selectSkyTraceAircraft(aircraft) {
   selectedAircraftId = aircraft.id
   skyTraceFollowAircraft = true
-  marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
+ 
+  const marker = aircraftMarkers.get(aircraft.id)
   
   if(marker) {
     marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
   }
   
-  skyTraceMap.setView([aircraft.latitude, aircraft.longitude], 10), {
+  skyTraceMap.setView([aircraft.latitude, aircraft.longitude], 10 ,{
     animate: true, duration: 0.8
-  }
-
-  const marker = aircraftMarkers.get(aircraft.id)
+  })
 
   showSkyTraceAircraftPanel(aircraft)
   showSkyTraceAircraftRoute(aircraft)
