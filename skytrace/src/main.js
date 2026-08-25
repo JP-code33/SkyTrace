@@ -413,7 +413,7 @@ function replaySkyTraceAircraft() {
   skyTraceReplayTimeline.max = history.length - 1
   skyTraceReplayTimeline.value - 0
   
-  skyTraceReplayTotalTime = formatSkyTraceReplayTime((history.length - 1) * 5)
+  skyTraceReplayTotalTime.textContent = formatSkyTraceReplayTime((history.length - 1) * 5)
   skyTraceReplayPlayPause.textContent = "Pause"
 
   function formatSkyTraceReplayTime(totalSeconds) {
