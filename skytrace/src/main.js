@@ -342,9 +342,9 @@ function selectSkyTraceAircraft(aircraft) {
     marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
   }
   
-  skyTraceMap.setView([aircraft.latitude, aircraft.longitude], Math.max(skyTraceMap.getZoom(), 7), {
-    animate: true, duration: 1
-  })
+  skyTraceMap.setView([aircraft.latitude, aircraft.longitude], 10), {
+    animate: true, duration: 0.8
+  }
 
   const marker = aircraftMarkers.get(aircraft.id)
 
