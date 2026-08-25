@@ -12,6 +12,7 @@ const skyTraceMap = L.map("map").setView([39.8, -98.5], 4)
 
 skyTraceMap.on("click", () => {
   closeSkyTraceAircraftPanel()
+  skyTraceFollowAircraft = false
 
   if(selectedAircraftRoute) {
     skyTraceMap.removeLayer(selectedAircraftRoute)
@@ -105,6 +106,7 @@ async function toggleSkyTraceRadar() {
 window.toggleSkyTraceRadar = toggleSkyTraceRadar
 
 let selectedAircraftId = null
+let skyTraceFollowAircraft = false
 
 function showSkyTraceAircraftPanel(aircraft) {
   document.getElementById("skyTraceAircraftCallsign").textContent = aircraft.callsign || "Unknown"
@@ -276,6 +278,10 @@ function updateAircraftMarkers(aircraftList) {
       updateSelectedAircraftPanel(aircraft)
     }
 
+    if(aircraft.id === selectedAircraftId && skyTraceFollowAircraft) {
+      skyTraceMap.panTo([aircraft.latitude, aircraft.longitude], {animate: true, duration: 0.8})
+    }
+
     currentAircraftIds.add(aircraft.id)
     createAircraftTrail(aircraft.id, aircraft.latitude, aircraft.longitude)
     let marker = aircraftMarkers.get(aircraft.id)
@@ -329,16 +335,18 @@ function updateAircraftMarkers(aircraftList) {
 
 function selectSkyTraceAircraft(aircraft) {
   selectedAircraftId = aircraft.id
+  skyTraceFollowAircraft = true
   marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
+  
+  if(marker) {
+    marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
+  }
+  
   skyTraceMap.setView([aircraft.latitude, aircraft.longitude], Math.max(skyTraceMap.getZoom(), 7), {
     animate: true, duration: 1
   })
 
   const marker = aircraftMarkers.get(aircraft.id)
-
-  if(marker) {
-    marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
-  }
 
   showSkyTraceAircraftPanel(aircraft)
   showSkyTraceAircraftRoute(aircraft)
