@@ -277,10 +277,12 @@ function updateAircraftMarkers(aircraftList) {
 
     if(aircraft.id === selectedAircraftId) {
       updateSelectedAircraftPanel(aircraft)
-    }
 
-    if(aircraft.id === selectedAircraftId && skyTraceFollowAircraft) {
-      skyTraceMap.panTo([aircraft.latitude, aircraft.longitude], {animate: true, duration: 0.8})
+      if(skyTraceFollowAircraft) {
+        skyTraceMap.panTo([aircraft.latitude, aircraft.longitude], {
+          animate: true, duration: 0.8
+        })
+      }
     }
 
     currentAircraftIds.add(aircraft.id)
