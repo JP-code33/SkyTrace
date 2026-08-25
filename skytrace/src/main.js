@@ -400,7 +400,7 @@ function replaySkyTraceAircraft() {
   let segmentStartTime = performance.now()
   const segmentDuration = 500
 
-  function animateReplay(currenTime) {
+  function animateReplay(currentTime) {
     if(!skyTraceReplayRunning) {
       return
     }
@@ -428,7 +428,7 @@ function replaySkyTraceAircraft() {
     skyTraceMap.panTo([latitude, longitude], {animate: false})
     if(progress >= 1) {
       historyIndex++
-      segmentStartTime = currenTime
+      segmentStartTime = currentTime
     }
     skyTraceReplayAnimation = requestAnimationFrame(animateReplay)
   }
