@@ -446,6 +446,7 @@ function stopSkyTraceReplay() {
 }
 
 skyTraceReplayButton.addEventListener("click", () => {
+  console.log("Replay button clicked")
   replaySkyTraceAircraft()
 })
 
