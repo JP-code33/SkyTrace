@@ -408,7 +408,7 @@ function replaySkyTraceAircraft() {
     console.log("SkyTrace: Not enough history to replay")
     return
   }
-  console.log("SkyTrace: Opening Replay HUD")
+  
   skyTraceReplayHud.classList.add("open")
 
   const marker = aircraftMarkers.get(selectedAircraftId)
@@ -507,6 +507,8 @@ skyTraceReplayButton.addEventListener("click", () => {
 })
 
 skyTraceReplayPlayPause.addEventListener("click", () => {
+  skyTraceReplayHud.classList.add("open")
+
   if(skyTraceReplayRunning) {
     skyTraceReplayRunning = false
 
