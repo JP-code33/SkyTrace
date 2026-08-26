@@ -157,6 +157,13 @@ const skyTraceReplayTotalTime = document.getElementById("skyTraceReplayTotalTime
 const skyTraceReplayPlayPause = document.getElementById("skyTraceReplayPlayPause")
 const skyTraceReplayRestart = document.getElementById("skyTraceReplayRestart")
 const skyTraceReplaySpeedButtons = document.querySelectorAll(".skyTraceReplaySpeed")
+const skyTraceReplayHud = document.getElementById("skyTraceReplayHud")
+const skyTraceReplayHudCallsign = document.getElementById("skyTraceReplayHudCallsign")
+const skyTraceReplayHudRoute = document.getElementById("skyTraceReplayHudRoute")
+const skyTraceReplayHudAltitude = document.getElementById("skyTraceReplayHudAltitude")
+const skyTraceReplayHudSpeed = document.getElementById("skyTraceReplayHudSpeed")
+const skyTraceReplayHudHeading = document.getElementById("skyTraceReplayHudHeading")
+const skyTraceReplayHudTime = document.getElementById("skyTraceReplayHudTime")
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -402,6 +409,8 @@ function replaySkyTraceAircraft() {
     return
   }
 
+  skyTraceReplayHud.classList.add("open")
+
   const marker = aircraftMarkers.get(selectedAircraftId)
   
   if(!marker) {
@@ -447,6 +456,7 @@ function replaySkyTraceAircraft() {
     const elapsed = currentTime - skyTraceReplayStartTime
     const duration = skyTraceReplaySegmentDuration / skyTraceReplaySpeed
     const progress = Math.min(elapsed / Duration, 1)
+    updateSkyTraceReplayHud({...marker.skyTraceAircraft, altitude: currentPoint.altitude, speed: currentPoint.speed, heading: currentPoint.heading}, (skyTraceReplayIndex + progress) * 5)
     const smoothProgress = progress * progress * (3 - 2 * progress)
     const latitude = currentPoint.latitude + (nextPoint.latitude - currentPoint.latitude) * smoothProgress
     const longitude = currentPoint.longitude + (nextPoint.longitude - currentPoint.longitude) * smoothProgress
@@ -465,6 +475,21 @@ function replaySkyTraceAircraft() {
   }
   skyTraceReplayAnimation = requestAnimationFrame(animateReplay)
   console.log(`SkyTrace: Starting replay with ${history.length} recorded points`)
+}
+
+function updateSkyTraceReplayHud(aircraft, replayTime) {
+  if(!aircraft) {
+    return
+  }
+
+  skyTraceReplayHudCallsign.textContent = aircraft.callsign || "Unknown"
+  const origin = aircraft.origin?.iata || aircraft.origin?.icao || "N/A"
+  const destination = aircraft.destination?.iata || aircraft.destination?.icao || "N/A"
+  skyTraceReplayHudRoute.textContent = `${origin} to ${destination}`
+  skyTraceReplayHudAltitude.textContent = aircraft.aircraft != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
+  skyTraceReplayHudSpeed.textContent = aircraft.speed != null ? `${Math.round(aircraft.speed)}kt` : "N/A"
+  skyTraceReplayHudHeading.textContent = aircraft.heading != null ? `${Math.round(aircraft.heading)}°` : "N/A"
+  skyTraceReplayHudTime.textContent = formatSkyTraceReplayTime(replayTime)
 }
 
 function stopSkyTraceReplay() {
