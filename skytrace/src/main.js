@@ -424,7 +424,7 @@ function replaySkyTraceAircraft() {
   skyTraceFollowAircraft = false
   skyTraceReplayRunning = true
   skyTraceReplayIndex = 0
-  let segmentStartTime = performance.now()
+  let skyTraceReplayStartTime  = performance.now()
   skyTraceReplayTimeline.max = history.length - 1
   skyTraceReplayTimeline.value = 0
   
@@ -455,7 +455,7 @@ function replaySkyTraceAircraft() {
     const nextPoint = history[skyTraceReplayIndex + 1]
     const elapsed = currentTime - skyTraceReplayStartTime
     const duration = skyTraceReplaySegmentDuration / skyTraceReplaySpeed
-    const progress = Math.min(elapsed / Duration, 1)
+    const progress = Math.min(elapsed / duration, 1)
     updateSkyTraceReplayHud({...marker.skyTraceAircraft, altitude: currentPoint.altitude, speed: currentPoint.speed, heading: currentPoint.heading}, (skyTraceReplayIndex + progress) * 5)
     const smoothProgress = progress * progress * (3 - 2 * progress)
     const latitude = currentPoint.latitude + (nextPoint.latitude - currentPoint.latitude) * smoothProgress
@@ -486,7 +486,7 @@ function updateSkyTraceReplayHud(aircraft, replayTime) {
   const origin = aircraft.origin?.iata || aircraft.origin?.icao || "N/A"
   const destination = aircraft.destination?.iata || aircraft.destination?.icao || "N/A"
   skyTraceReplayHudRoute.textContent = `${origin} to ${destination}`
-  skyTraceReplayHudAltitude.textContent = aircraft.aircraft != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
+  skyTraceReplayHudAltitude.textContent = aircraft.altitude != null ? `${Math.round(aircraft.altitude)}ft` : "N/A"
   skyTraceReplayHudSpeed.textContent = aircraft.speed != null ? `${Math.round(aircraft.speed)}kt` : "N/A"
   skyTraceReplayHudHeading.textContent = aircraft.heading != null ? `${Math.round(aircraft.heading)}°` : "N/A"
   skyTraceReplayHudTime.textContent = formatSkyTraceReplayTime(replayTime)
