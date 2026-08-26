@@ -164,6 +164,7 @@ const skyTraceReplayHudAltitude = document.getElementById("skyTraceReplayHudAlti
 const skyTraceReplayHudSpeed = document.getElementById("skyTraceReplayHudSpeed")
 const skyTraceReplayHudHeading = document.getElementById("skyTraceReplayHudHeading")
 const skyTraceReplayHudTime = document.getElementById("skyTraceReplayHudTime")
+let skyTraceReplayMode = false
 
 function createAircraftIcon(heading) {
   return L.divIcon({
@@ -293,7 +294,7 @@ function updateAircraftMarkers(aircraftList) {
     if(aircraft.id === selectedAircraftId) {
       updateSelectedAircraftPanel(aircraft)
 
-      if(skyTraceFollowAircraft) {
+      if(skyTraceFollowAircraft && !skyTraceReplayMode) {
         skyTraceMap.panTo([aircraft.latitude, aircraft.longitude], {
           animate: true, duration: 0.8
         })
@@ -344,7 +345,11 @@ function updateAircraftMarkers(aircraftList) {
       marker.skyTraceAircraft = aircraft
       const currentPosition = marker.getLatLng()
 
-      animateAircraftMarker(marker, aircraft.id, [currentPosition.lat, currentPosition.lng], [aircraft.latitude, aircraft.longitude], 5000)
+      if(!skyTraceReplayMode) {
+        animateAircraftMarker(marker, aircraft.id, [currentPosition.lat, currentPosition.lng], [aircraft.latitude, aircraft.longitude], 5000)
+
+      }
+      
       if(aircraft.id === selectedAircraftId) {
         marker.setIcon(createSelectedAircraftIcon(aircraft.heading))
       } else {
@@ -363,6 +368,15 @@ function updateAircraftMarkers(aircraftList) {
 
 function selectSkyTraceAircraft(aircraft) {
   hideSkyTraceReplayHud()
+
+  skyTraceReplayMode = false
+  skyTraceReplayRunning = false
+  skyTraceReplayIndex = 0
+  if(skyTraceReplayAnimation) {
+    cancelAnimationFrame(skyTraceReplayAnimation)
+    skyTraceReplayAnimation = null
+  }
+
   selectedAircraftId = aircraft.id
   skyTraceFollowAircraft = true
  
@@ -423,6 +437,7 @@ function replaySkyTraceAircraft() {
   }
 
   skyTraceFollowAircraft = false
+  skyTraceReplayMode = true
   skyTraceReplayRunning = true
   skyTraceReplayIndex = 0
   let skyTraceReplayStartTime  = performance.now()
@@ -446,6 +461,7 @@ function replaySkyTraceAircraft() {
       skyTraceReplayCurrentTime.textContent = formatSkyTraceReplayTime((history.length - 1) * 5)
 
       skyTraceReplayRunning = false
+      skyTraceReplayMode = false
       skyTraceReplayAnimation = null
       skyTraceReplayPlayPause.textContent = "Play"
       hideSkyTraceReplayHud()
@@ -513,7 +529,7 @@ skyTraceReplayButton.addEventListener("click", () => {
 })
 
 skyTraceReplayPlayPause.addEventListener("click", () => {
-  skyTraceReplayHud.classList.add("open")
+  
 
   if(skyTraceReplayRunning) {
     skyTraceReplayRunning = false
@@ -529,6 +545,17 @@ skyTraceReplayPlayPause.addEventListener("click", () => {
 
     if(!history || history.length < 2) {
       return
+    }
+
+    const marker = aircraftMarkers.get(selectSkyTraceAircraft)
+    if(marker) {
+      updateSkyTraceReplayHud(marker.skyTraceAircraft, skyTraceReplayIndex * 5)
+    }
+    skyTraceReplayHud.classList.add("open")
+
+    const currrentPoint = history[skyTraceReplayIndex]
+    if(marker && currrentPoint) {
+      marker.setLatLng([currrentPoint.latitude, currrentPoint.longitude])
     }
 
     skyTraceReplayRunning = true
