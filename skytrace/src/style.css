@@ -478,3 +478,96 @@ body {
 .skyTraceReplayButtons .active {
   background: rgba(77, 163, 255, 0.25);
 }
+
+.skyTraceReplayHud {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2000;
+  width: 270px;
+  padding: 16px;
+  box-sizing: border-box;
+  background: rgba(10, 18, 28, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  color: white;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transform: translateY(15px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.skyTraceReplayHud.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.skyTraceReplayHudTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.skyTraceReplayLiveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff4d4d;
+  box-shadow: 0 0 8px #ff4d4d;
+  animation: skyTraceReplayPulse 1.2s infinite;
+}
+
+.skyTraceReplayHudCallsign {
+  font-size: 23px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.skyTraceReplayHudRoute {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.skyTraceReplayHudGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.skyTraceReplayHudGrid div {
+  padding: 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.skyTraceReplayHudGrid span {
+  display: block;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 9px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.skyTraceReplayHudGrid strong {
+  display: block;
+  color: white;
+  font-size: 13px;
+}
+
+@keyframes skyTraceReplayPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
