@@ -362,6 +362,7 @@ function updateAircraftMarkers(aircraftList) {
 }
 
 function selectSkyTraceAircraft(aircraft) {
+  hideSkyTraceReplayHud()
   selectedAircraftId = aircraft.id
   skyTraceFollowAircraft = true
  
@@ -447,6 +448,7 @@ function replaySkyTraceAircraft() {
       skyTraceReplayRunning = false
       skyTraceReplayAnimation = null
       skyTraceReplayPlayPause.textContent = "Play"
+      hideSkyTraceReplayHud()
       console.log("SkyTrace: Replay finished")
       return
     }
@@ -490,6 +492,10 @@ function updateSkyTraceReplayHud(aircraft, replayTime) {
   skyTraceReplayHudSpeed.textContent = aircraft.speed != null ? `${Math.round(aircraft.speed)}kt` : "N/A"
   skyTraceReplayHudHeading.textContent = aircraft.heading != null ? `${Math.round(aircraft.heading)}°` : "N/A"
   skyTraceReplayHudTime.textContent = formatSkyTraceReplayTime(replayTime)
+}
+
+function hideSkyTraceReplayHud() {
+  skyTraceReplayHud.classList.remove("open")
 }
 
 function stopSkyTraceReplay() {
