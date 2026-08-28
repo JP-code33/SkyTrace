@@ -239,6 +239,22 @@ function showSkyTraceAircraftRoute(aircraft) {
     return
   }
 
+  const currentLat = aircraft.latitude
+  const currentLon = aircraft.longitude
+  const routePoints = []
+  const curveAmount = Math.min(20, Math.max(5, Math.abs(destinationLon - originLon) * 0.15))
+
+  const midLat = (originLat + destinationLat) / 2 + curveAmount
+  const midLon = (originLon + destinationLon) / 2
+  const steps = 50
+  for(let i = 0; i <= steps; i++) {
+    const x = i / steps
+    const oneMinusX = 1 - x
+    const latitude = oneMinusX * oneMinusX * originLat + 2 * oneMinusX * x * midLat + x * x * destinationLat
+    const longitude = oneMinusX * oneMinusX * originLon + 2 * oneMinusX * x * midLon + x * x * destinationLon
+    routePoints.push([latitude, longitude])
+  }
+
   selectedAircraftRoute = L.polyline(
     [[originLat, originLon], [destinationLat, destinationLon]], {color: "#4da3ff", weight: 3, opacity: 0.75, dashArray: "8 8"}
   ).addTo(skyTraceMap)
