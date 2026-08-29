@@ -571,3 +571,7 @@ body {
     opacity: 0.35;
   }
 }
+
+.skyTraceDarkMap .leaflet-tile-pane {
+  filter: invert(90%) hue-rotate(180deg) brightness(75%) contrast(90%);
+}

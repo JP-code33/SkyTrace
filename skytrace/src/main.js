@@ -37,8 +37,8 @@ const skyTraceStandardMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/
   attribution: "&copy; OpenStreeMap contributors"
 })
 
-const skyTraceDarkLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{x}/{y}{r}.png", {
-  attribution: "&copy; Esri"
+const skyTraceDarkLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "&copy; OpenStreeMap contributors"
 })
 
 const skyTraceSatelliteLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
@@ -54,12 +54,16 @@ skyTraceStandardMap.addTo(skyTraceMap)
 const skyTraceMapLayers = {standard: skyTraceStandardMap, dark: skyTraceDarkLayer, satellite: skyTraceSatelliteLayer, terrain: skyTraceTerrainLayer}
 
 function changeSkyTraceMapLayer(skyTraceLayerName) {
-  Object.values(skyTraceMapLayers).forEach((skyTraceLayer) => {
+  Object.entries(skyTraceMapLayers).forEach(([layerName, skyTraceLayer]) => {
     if(skyTraceMap.hasLayer(skyTraceLayer)) {
       skyTraceMap.removeLayer(skyTraceLayer)
     }
   })
+  skyTraceMap.getContainer().classList.remove("skyTraceDarkMap")
   skyTraceMapLayers[skyTraceLayerName].addTo(skyTraceMap)
+  if(skyTraceLayerName === "dark") {
+    skyTraceMap.getContainer().classList.add("skyTraceDarkMap")
+  }
 }
 window.changeSkyTraceMapLayer = changeSkyTraceMapLayer
 
