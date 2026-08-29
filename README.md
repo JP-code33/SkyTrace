@@ -2,7 +2,7 @@
 
 I have build a live flight tracker web application. It lets the user explore aircrafts and see their information. They can replay the history and aircraft movement. 
 
-#Features
+# Features
 
 1. Live aircraft tracking on a map
 2. Choose the map style you want
