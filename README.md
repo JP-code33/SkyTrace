@@ -33,4 +33,12 @@ I have build a live flight tracker web application. It lets the user explore air
 
 # How It Works
 
-So what I have made is I think everyone knows about a flight tracker. To use it, what you do is that zoom in an area where you want to see the aircrafts. This is because the free API only provides a radius of 250 nm and that is why this tracker is limited. **When first loaded it will take a while to load because it has to load a lot of aircraft like 1-2 minutes**.
+So what I have made is I think everyone knows about a flight tracker. To use it, what you do is that zoom in an area where you want to see the aircrafts. This is because the free API only provides a radius of 250 nm and that is why this tracker is limited. **When first loaded it will take a while to load because it has to load a lot of aircraft like 1-2 minutes. Also it doesn't show aircrafts above oceans and I checked in the API's official tracker and it is the same for them as well**. You can search a plane within that radius. If you select an aircraft then it auto follows that aircraft. The system also records history so that the replay button works. You can watch the replay at any speed you want. 
+
+# About Me
+
+I have always been fascinated with aircrafts and I have found flight trackers and wanted to make one of my own and here it is. 
+
+# License
+
+MIT License
