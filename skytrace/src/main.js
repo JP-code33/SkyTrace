@@ -304,8 +304,8 @@ function showSkyTraceAircraftRoute(aircraft) {
     routePoints.push([latitude, longitude])
   }
 
-  selectedAircraftRoute = L.polyline(
-    [[originLat, originLon], [destinationLat, destinationLon]], {color: "#4da3ff", weight: 3, opacity: 0.75, dashArray: "8 8"}
+  selectedAircraftRoute = L.polyline(routePoints,
+    {color: "#4da3ff", weight: 3, opacity: 0.75, dashArray: "8 8"}
   ).addTo(skyTraceMap)
 
   selectedAircraftCompletedRoute = L.polyline([], {
@@ -617,7 +617,7 @@ skyTraceReplayPlayPause.addEventListener("click", () => {
       return
     }
 
-    const marker = aircraftMarkers.get(selectSkyTraceAircraft)
+    const marker = aircraftMarkers.get(selectedAircraftId)
     if(marker) {
       updateSkyTraceReplayHud(marker.skyTraceAircraft, skyTraceReplayIndex * 5)
     }
