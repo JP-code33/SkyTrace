@@ -37,8 +37,8 @@ const skyTraceStandardMap = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/
   attribution: "&copy; OpenStreeMap contributors"
 })
 
-const skyTraceDarkLayer = L.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png", {
-  attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+const skyTraceDarkLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{x}/{y}{r}.png", {
+  attribution: "&copy; Esri"
 })
 
 const skyTraceSatelliteLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
