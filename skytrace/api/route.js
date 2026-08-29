@@ -8,7 +8,7 @@ export default async function handler(request, response) {
         }
 
         try {
-            const routeUrl = `https://api.adsb.com/v0/callsign/${encodeURIComponent(callsign)}`
+            const routeUrl = `https://api.adsbdb.com/v0/callsign/${encodeURIComponent(callsign)}`
             const routeResponse = await fetch(routeUrl)
 
             if(routeResponse.ok) {
@@ -74,7 +74,7 @@ export default async function handler(request, response) {
                 name: origin.airport || null, iata: origin.iata || null, icao: origin.icao || originIcao, latitude: Number(origin.latitude), longitude: Number(origin.longitude)
             },
             destination: {
-                name: destination.airport || null, iata: destination.iata || null, icao: destination.icao || destinationIcao, latitude: Number(destination.latitude), longitude: Number(destination.longtiude)
+                name: destination.airport || null, iata: destination.iata || null, icao: destination.icao || destinationIcao, latitude: Number(destination.latitude), longitude: Number(destination.longitude)
             },
             source: "hexDB"
         })
