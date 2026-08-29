@@ -19,6 +19,11 @@ skyTraceMap.on("click", () => {
     selectedAircraftRoute = null
   }
 
+  if(selectedAircraftCompletedRoute) {
+    skyTraceMap.removeLayer(selectedAircraftCompletedRoute)
+    selectedAircraftCompletedRoute = null
+  }
+
   if(selectedAircraftId) {
     const trail = aircraftTrails.get(selectedAircraftId)
     if(trail) {
@@ -146,6 +151,7 @@ const aircraftMarkers = new Map()
 const aircraftAnimationFrames = new Map()
 const aircraftTrails = new Map()
 let selectedAircraftRoute = null
+let selectedAircraftCompletedRoute = null
 const skyTraceFlightSearch = document.getElementById("skyTraceFlightSearch")
 const skyTraceSearchResults = document.getElementById("skyTraceSearchResults")
 const aircraftHistory = new Map()
@@ -222,11 +228,54 @@ function createAircraftTrail(aircraftId, latitude, longitude) {
   trail.setLatLngs(points)
 }
 
+function updateSkyTraceAircraftRouteProgress(aircraft) {
+  if(selectedAircraftId !== aircraft.id) {
+    return
+  }
+
+  if(!selectedAircraftRoute || !selectedAircraftCompletedRoute) {
+    return
+  }
+
+  const history = aircraftHistory.get(aircraft.id)
+  if(!history || history.length < 2) {
+    return
+  }
+
+  const progressPoint = [aircraft.latitude, aircraft.longitude]
+  const routeLatLngs = selectedAircraftRoute.getLatLngs()
+  let closestIndex = 0
+  let closestDistance = Infinity
+
+  routeLatLngs.forEach((point, index) => {
+    const distance = skyTraceMap.distance(progressPoint, [point.lat, point.lng])
+    if(distance < closestDistance) {
+      closestDistance = distance
+      closestIndex = index
+    }
+  })
+
+  if(closestIndex <= 0) {
+    selectedAircraftCompletedRoute.setLatLngs([])
+    return
+  }
+
+  const completedPoints = routeLatLngs.slice(0, closestIndex + 1)
+  completedPoints.push(progressPoint)
+  selectedAircraftCompletedRoute.setLatLngs(completedPoints)
+}
+
 function showSkyTraceAircraftRoute(aircraft) {
   if(selectedAircraftRoute) {
     skyTraceMap.removeLayer(selectedAircraftRoute)
     selectedAircraftRoute = null
   }
+
+  if(selectedAircraftCompletedRoute) {
+    skyTraceMap.removeLayer(selectedAircraftCompletedRoute)
+    selectedAircraftCompletedRoute = null
+  }
+
   if(!aircraft.origin || !aircraft.destination) {
     return
   }
@@ -258,6 +307,10 @@ function showSkyTraceAircraftRoute(aircraft) {
   selectedAircraftRoute = L.polyline(
     [[originLat, originLon], [destinationLat, destinationLon]], {color: "#4da3ff", weight: 3, opacity: 0.75, dashArray: "8 8"}
   ).addTo(skyTraceMap)
+
+  selectedAircraftCompletedRoute = L.polyline([], {
+    color: "#4da3ff", weight: 4, opacity: 0.95, smoothFactor: 1
+  }).addTo(skyTraceMap)
 }
 
 skyTraceFlightSearch.addEventListener("input", () => {
@@ -309,6 +362,7 @@ function updateAircraftMarkers(aircraftList) {
 
     if(aircraft.id === selectedAircraftId) {
       updateSelectedAircraftPanel(aircraft)
+      updateSkyTraceAircraftRouteProgress(aircraft)
 
       if(skyTraceFollowAircraft && !skyTraceReplayMode) {
         skyTraceMap.panTo([aircraft.latitude, aircraft.longitude], {
